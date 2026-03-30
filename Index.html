@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GLASS-India · Graded Levels of Alcohol in Steatotic liver disease Staging</title>
+<meta name="description" content="Quantify alcohol intake using Indian drink types. Classify into MASLD, MetALD, or ALD per 2023 Delphi consensus. Privacy-first, on-device calculator.">
+<meta property="og:title" content="GLASS-India · Graded Levels of Alcohol in Steatotic liver disease Staging">
+<meta property="og:description" content="India-specific alcohol quantification tool. Classify into MASLD, MetALD, or ALD per 2023 Delphi consensus. Privacy-first, no data collected.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GLASS-India · Graded Levels of Alcohol in Steatotic liver disease Staging">
+<meta name="twitter:description" content="India-specific alcohol quantification for SLD classification. Privacy-first, on-device. No data collected.">
+<meta name="author" content="Dr Akash Roy, Institute of Gastrosciences and Liver Transplantation, Apollo Multispeciality Hospitals, Kolkata">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥃</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:#f8fafc;color:#0f172a;min-height:100vh;-webkit-tap-highlight-color:transparent}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.wrap{max-width:580px;margin:0 auto;padding:20px 14px 60px}
+
+/* Progress */
+.prog{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.pdot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all .3s;flex-shrink:0}
+.pdot.done{background:#0f172a;color:#fff}
+.pdot.on{background:#3b82f6;color:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+.pdot.off{background:#e2e8f0;color:#94a3b8}
+.pline{flex:1;height:2px;transition:background .3s}
+.pline.done{background:#0f172a}
+.pline.off{background:#e2e8f0}
+
+.card{background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.cb{padding:24px 20px}
+.pbtn{width:100%;padding:14px;border-radius:14px;border:none;background:#0f172a;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:12px}
+.pbtn:active{transform:scale(.98)}.pbtn:disabled{background:#cbd5e1;cursor:not-allowed}
+.gbtn{width:100%;padding:12px;border-radius:14px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.gbtn:active{transform:scale(.98)}
+
+/* Option cards */
+.opt{padding:16px;border-radius:14px;border:2px solid #e2e8f0;cursor:pointer;transition:all .2s;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.opt.sel{border-color:#3b82f6;background:#eff6ff}
+.opt .rd{width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.opt.sel .rd{border-color:#3b82f6;background:#3b82f6}
+.opt.sel .rd::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+.opt .tt{font-size:14px;font-weight:600}
+.opt .ds{font-size:12px;color:#64748b;margin-top:2px}
+
+/* Gender */
+.gg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gc{padding:24px 16px;border-radius:16px;border:2px solid #e2e8f0;cursor:pointer;text-align:center;transition:all .2s}
+.gc.sel{border-color:#3b82f6;background:#eff6ff}
+.gc .ic{font-size:40px;margin-bottom:8px}
+.gc .lb{font-size:17px;font-weight:700}
+
+/* Drinks */
+.qr{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.qb{display:flex;align-items:center;gap:4px;padding:7px 14px;border-radius:24px;border:1px solid #e2e8f0;background:#fff;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .12s}
+.qb:hover{background:#f1f5f9;border-color:#cbd5e1}.qb:active{transform:scale(.96)}
+.cl{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 4px}
+.cb2{padding:6px 12px;border-radius:10px;border:1px solid #e2e8f0;background:#fafafa;font-size:12px;cursor:pointer;text-align:left}.cb2:hover{background:#f1f5f9}
+.cb2 .nm{font-weight:600}.cb2 .dt{font-size:10px;color:#94a3b8}
+
+.entry{padding:14px;background:#f8fafc;border-radius:14px;margin-bottom:8px}
+.ehd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ehd .lt{display:flex;align-items:center;gap:8px}
+.en{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#e2e8f0;font-size:11px;font-weight:700;color:#475569}
+.enm{font-size:14px;font-weight:600}
+.ew{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#475569}
+.xb{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:18px;font-weight:700;padding:2px 6px;border-radius:6px;margin-left:6px}.xb:hover{color:#ef4444}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:2px}
+.fl{font-size:11px;color:#64748b;font-weight:500}
+.ni{display:flex;align-items:center;gap:4px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;height:36px;padding:0 10px}
+.ni input{flex:1;width:44px;border:none;background:transparent;font-size:14px;font-weight:600;color:#0f172a;outline:none}
+.ni .u{font-size:11px;color:#94a3b8}
+.stp{display:flex;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;height:36px}
+.stp button{width:34px;height:36px;border:none;background:transparent;cursor:pointer;font-size:18px;color:#475569;font-weight:600}.stp button:active{background:#f1f5f9}
+.stp input{width:40px;text-align:center;border:none;background:transparent;font-size:14px;font-weight:600;color:#0f172a;outline:none}
+.ub{height:36px;padding:0 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer}
+.ub.on{border:1px solid #fbbf24;background:#fffbeb;color:#b45309}
+.ub.off{border:1px solid #e2e8f0;background:#fff;color:#94a3b8}
+.rt{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;background:#f1f5f9;margin-top:12px;font-size:13px}
+.rt .v{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:16px}
+.mono{font-family:'IBM Plex Mono',monospace}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:#065f46}
+.disc{display:flex;align-items:flex-start;gap:8px;padding:12px 16px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;font-size:12px;color:#92400e;margin-top:16px}
+.lbtn{font-size:12px;font-weight:600;color:#3b82f6;background:none;border:none;cursor:pointer}
+.cpb{font-size:14px;font-weight:600;padding:10px 20px;border-radius:12px;cursor:pointer;border:1px solid;background:#fff;transition:all .15s}.cpb:active{transform:scale(.97)}
+.rsb{font-size:14px;font-weight:600;padding:10px 20px;border-radius:12px;cursor:pointer;border:1px solid;background:transparent;opacity:.6}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.rtbl th{padding:6px 8px;font-weight:600;text-align:left;border-bottom:2px solid #e2e8f0}
+.rtbl td{padding:6px 8px}
+.rtbl .r0{background:#ecfdf5}.rtbl .r1{background:#fffbeb;border-top:1px solid #f1f5f9}.rtbl .r2{background:#fef2f2;border-top:1px solid #f1f5f9}
+.pill{display:inline-block;padding:4px 14px;border-radius:24px;font-size:13px;font-weight:600;margin:4px 4px 4px 0}
+/* Lifetime input */
+.lyinp{display:flex;align-items:center;gap:8px;margin-top:12px}
+.lyinp input{width:80px;height:42px;border:1px solid #e2e8f0;border-radius:12px;text-align:center;font-size:18px;font-weight:700;color:#0f172a;outline:none;background:#f8fafc}
+.lyinp input:focus{border-color:#3b82f6}
+.lyinp span{font-size:14px;color:#64748b}
+@media(max-width:400px){.ctrls{gap:6px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+var h=React.createElement,us=React.useState,um=React.useMemo,uc=React.useCallback;
+var DN=0.789;
+var THR={female:{masld:140,metald:350},male:{masld:210,metald:420}};
+var CATS=[
+  {name:"Spirits (IMFL)",drinks:[
+    {key:"sp30",label:"Small peg",detail:"30 mL \xb7 42.8%",vol:30,abv:42.8},
+    {key:"sp60",label:"Large peg",detail:"60 mL \xb7 42.8%",vol:60,abv:42.8},
+    {key:"sp90",label:"Patiala peg",detail:"90 mL \xb7 42.8%",vol:90,abv:42.8},
+    {key:"sp180",label:"Quarter",detail:"180 mL \xb7 42.8%",vol:180,abv:42.8},
+    {key:"sp375",label:"Half bottle",detail:"375 mL \xb7 42.8%",vol:375,abv:42.8},
+    {key:"sp750",label:"Full bottle",detail:"750 mL \xb7 42.8%",vol:750,abv:42.8}]},
+  {name:"Beer",drinks:[
+    {key:"b330",label:"Can 330 mL",detail:"~5%",vol:330,abv:5},
+    {key:"b500",label:"Can 500 mL",detail:"~5%",vol:500,abv:5},
+    {key:"b650",label:"Bottle 650 mL",detail:"~5%",vol:650,abv:5},
+    {key:"sb500",label:"Strong 500 mL",detail:"~8%",vol:500,abv:8},
+    {key:"sb650",label:"Strong 650 mL",detail:"~8%",vol:650,abv:8}]},
+  {name:"Wine / RTD",drinks:[
+    {key:"wg",label:"Wine glass",detail:"150 mL \xb7 12%",vol:150,abv:12},
+    {key:"wb",label:"Wine bottle",detail:"750 mL \xb7 12%",vol:750,abv:12},
+    {key:"rtd",label:"RTD / premix",detail:"330 mL \xb7 4.5%",vol:330,abv:4.5}]},
+  {name:"Local / Other",drinks:[
+    {key:"cl",label:"Country liquor",detail:"60 mL \xb7 ~30%",vol:60,abv:30,unc:1},
+    {key:"toddy",label:"Toddy / palm wine",detail:"250 mL \xb7 ~6%",vol:250,abv:6,unc:1},
+    {key:"custom",label:"Custom drink",detail:"edit values",vol:60,abv:40}]}
+];
+var ALL=CATS.reduce(function(a,c){return a.concat(c.drinks);},[]);
+function fD(k){return ALL.find(function(d){return d.key===k;})||ALL[0];}
+function eth(v,a){return((Number(v)||0)*(Number(a)||0)*DN)/100;}
+function fx(n,d){d=d==null?1:d;return Number.isFinite(n)?n.toFixed(d):"0";}
+function clsf(wk,sex){var t=THR[sex];if(wk<t.masld)return{label:"MASLD range",sub:"Below significant alcohol threshold",color:"#059669",bg:"#ecfdf5",bd:"#6ee7b7"};if(wk<=t.metald)return{label:"MetALD range",sub:"Metabolic + alcohol overlap zone",color:"#d97706",bg:"#fffbeb",bd:"#fcd34d"};return{label:"ALD range",sub:"Above alcohol-associated threshold",color:"#dc2626",bg:"#fef2f2",bd:"#fca5a5"};}
+function mE(k){k=k||"sp60";var d=fD(k);return{id:Date.now()+Math.random(),dk:k,vol:d.vol,abv:d.abv,srv:1,days:1,unc:!!d.unc,abvMin:d.unc?Math.max(0,d.abv-5):d.abv,abvMax:d.unc?d.abv+5:d.abv};}
+function Stp(p){var v=Number(p.value)||0;return h("div",{className:"fld"},p.label&&h("span",{className:"fl"},p.label),h("div",{className:"stp"},h("button",{onClick:function(){p.onChange(Math.max(p.min||0,+(v-(p.step||1)).toFixed(1)));}},"−"),h("input",{type:"number",value:p.value,onChange:function(e){var n=Number(e.target.value);if(!isNaN(n))p.onChange(Math.min(p.max||99,Math.max(p.min||0,n)));}}),h("button",{onClick:function(){p.onChange(Math.min(p.max||99,+(v+(p.step||1)).toFixed(1)));}},"+")));}
+function NI(p){return h("div",{className:"fld"},h("span",{className:"fl"},p.label),h("div",{className:"ni"},h("input",{type:"number",step:p.step||1,value:p.value,onChange:function(e){p.onChange(e.target.value);}}),p.unit&&h("span",{className:"u"},p.unit)));}
+function Prog(p){var n=p.n;return h("div",{className:"prog"},[1,2,3,4,5,6].map(function(i){var c=i<p.s?"done":i===p.s?"on":"off";return h(React.Fragment,{key:i},i>1&&h("div",{className:"pline "+(i<=p.s?"done":"off")}),h("div",{className:"pdot "+c},i));}));}
+
+function App(){
+  var _s=us(0),step=_s[0],go=_s[1];
+  var _sx=us(null),sex=_sx[0],setSex=_sx[1];
+  var _ds=us(null),dstat=_ds[0],setDS=_ds[1]; // "lifetime_abstainer","current_abstainer","active"
+  var _e=us([]),ent=_e[0],setE=_e[1];
+  var _bg=us(null),binge=_bg[0],setBg=_bg[1];
+  var _ly=us(""),lyrs=_ly[0],setLy=_ly[1];
+  var _cp=us(false),copied=_cp[0],setCp=_cp[1];
+  var _sa=us(false),showAll=_sa[0],setSA=_sa[1];
+
+  var upd=uc(function(id,p){setE(function(c){return c.map(function(e){return e.id!==id?e:Object.assign({},e,p);});});},[]);
+  var rm=uc(function(id){setE(function(c){return c.filter(function(e){return e.id!==id;});});},[]);
+  var add=uc(function(k){setE(function(c){return c.concat(mE(k));});setSA(false);},[]);
+  var reset=function(){go(0);setSex(null);setDS(null);setE([]);setBg(null);setLy("");setCp(false);setSA(false);};
+
+  var calc=um(function(){
+    var rows=ent.map(function(e){var g=eth(e.vol,e.abv),dg=g*(Number(e.srv)||0),wg=dg*(Number(e.days)||0);return Object.assign({},e,{g:g,dg:dg,wg:wg});});
+    var tw=rows.reduce(function(s,r){return s+r.wg;},0);
+    return{rows:rows,tw:tw,ad:tw/7,u:tw/10};
+  },[ent]);
+
+  // Dynamic step count based on drinking status
+  // Lifetime abstainer: sex(1) → status(2) → result(3) — skip drinks, binge, years
+  // Current abstainer: sex(1) → status(2) → binge+years(3) → result(4)
+  // Active: sex(1) → status(2) → drinks(3) → binge+years(4) → result(5)
+
+  var QK=[{key:"sp60",i:"\uD83E\uDD43",l:"Large peg"},{key:"sp30",i:"\uD83E\uDD43",l:"Small peg"},{key:"sp90",i:"\uD83E\uDD43",l:"Patiala peg"},{key:"b650",i:"\uD83C\uDF7A",l:"Beer 650"},{key:"sb500",i:"\uD83C\uDF7A",l:"Strong 500"},{key:"sp180",i:"\uD83E\uDD43",l:"Quarter"},{key:"wg",i:"\uD83C\uDF77",l:"Wine glass"},{key:"cl",i:"\uD83E\uDED7",l:"Country liq."}];
+
+  return h("div",{className:"wrap"},
+    // Header
+    h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}},
+      h("div",null,h("h1",{style:{fontSize:21,fontWeight:700,letterSpacing:"-0.02em"}},"GLASS-India"),h("p",{style:{fontSize:12,color:"#64748b",marginTop:2}},"Graded Levels of Alcohol in Steatotic liver disease Staging")),
+      h("div",{className:"badge"},h("svg",{width:14,height:14,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:2.5,strokeLinecap:"round",strokeLinejoin:"round"},h("path",{d:"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"})),"On-device")),
+
+    /* ═══ STEP 0: WELCOME ═══ */
+    step===0&&h("div",{className:"card"},h("div",{className:"cb",style:{textAlign:"center",padding:"40px 24px"}},
+      h("div",{style:{fontSize:48,marginBottom:16}},"\uD83E\uDD43"),
+      h("h2",{style:{fontSize:22,fontWeight:700,marginBottom:4}},"GLASS-India"),
+      h("p",{style:{fontSize:13,color:"#64748b",fontStyle:"italic",marginBottom:12}},"Graded Levels of Alcohol in Steatotic liver disease Staging"),
+      h("p",{style:{fontSize:14,color:"#64748b",lineHeight:1.6,maxWidth:420,margin:"0 auto 8px"}},"Quantify alcohol intake using Indian drink types and classify per the 2023 Delphi SLD consensus into MASLD, MetALD, or ALD."),
+      h("p",{style:{fontSize:12,color:"#94a3b8",marginBottom:24}},"Rinella ME et al. J Hepatol 2023;79:1542-56"),
+      h("button",{className:"pbtn",onClick:function(){go(1);}},"Start Assessment"),
+      h("div",{style:{marginTop:20,fontSize:11,color:"#94a3b8"}},"No data leaves this device. All calculations are local."))),
+
+    /* ═══ STEP 1: SEX ═══ */
+    step===1&&h("div",{className:"card"},h("div",{className:"cb"},
+      h("h2",{style:{fontSize:18,fontWeight:700,marginBottom:4}},"Select sex"),
+      h("p",{style:{fontSize:13,color:"#64748b",marginBottom:16}},"Required because SLD alcohol thresholds are sex-specific"),
+      h("div",{className:"gg"},
+        h("div",{className:"gc"+(sex==="male"?" sel":""),onClick:function(){setSex("male");}},h("div",{className:"ic"},"\u2642\uFE0F"),h("div",{className:"lb"},"Male")),
+        h("div",{className:"gc"+(sex==="female"?" sel":""),onClick:function(){setSex("female");}},h("div",{className:"ic"},"\u2640\uFE0F"),h("div",{className:"lb"},"Female"))),
+      h("button",{className:"pbtn",disabled:!sex,onClick:function(){go(2);}},"Continue"),
+      h("button",{className:"gbtn",onClick:function(){go(0);}},"Back"))),
+
+    /* ═══ STEP 2: DRINKING STATUS ═══ */
+    step===2&&h("div",{className:"card"},h("div",{className:"cb"},
+      h("h2",{style:{fontSize:18,fontWeight:700,marginBottom:4}},"Drinking status"),
+      h("p",{style:{fontSize:13,color:"#64748b",marginBottom:16}},"Current relationship with alcohol"),
+      h("div",{className:"opt"+(dstat==="lifetime_abstainer"?" sel":""),onClick:function(){setDS("lifetime_abstainer");}},
+        h("div",{className:"rd"}),h("div",null,h("div",{className:"tt"},"Lifetime abstainer"),h("div",{className:"ds"},"Has never consumed alcohol"))),
+      h("div",{className:"opt"+(dstat==="current_abstainer"?" sel":""),onClick:function(){setDS("current_abstainer");}},
+        h("div",{className:"rd"}),h("div",null,h("div",{className:"tt"},"Current abstainer"),h("div",{className:"ds"},"No alcohol in the last 6 months, but has a drinking history"))),
+      h("div",{className:"opt"+(dstat==="active"?" sel":""),onClick:function(){setDS("active");}},
+        h("div",{className:"rd"}),h("div",null,h("div",{className:"tt"},"Active drinker"),h("div",{className:"ds"},"Has consumed alcohol within the last 6 months"))),
+      h("button",{className:"pbtn",disabled:!dstat,onClick:function(){
+        if(dstat==="lifetime_abstainer") go(10); // jump to result
+        else if(dstat==="current_abstainer") go(5); // skip drinks, go to binge+years
+        else go(3); // active → drinks
+      }},"Continue"),
+      h("button",{className:"gbtn",onClick:function(){go(1);}},"Back"))),
+
+    /* ═══ STEP 3: ADD DRINKS (active only) ═══ */
+    step===3&&h("div",null,
+      h("div",{className:"card"},h("div",{className:"cb"},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+          h("div",null,h("h2",{style:{fontSize:18,fontWeight:700,marginBottom:2}},"Add drinks"),h("p",{style:{fontSize:13,color:"#64748b"}},"Typical weekly drinking pattern")),
+          h("button",{className:"lbtn",onClick:function(){setSA(!showAll);}},showAll?"Common only":"All types")),
+        h("div",{className:"qr"},QK.map(function(q){return h("button",{key:q.key,className:"qb",onClick:function(){add(q.key);}},q.i+" "+q.l);})),
+        showAll&&CATS.map(function(cat){return h("div",{key:cat.name},h("div",{className:"cl"},cat.name),h("div",{className:"qr"},cat.drinks.map(function(d){return h("button",{key:d.key,className:"cb2",onClick:function(){add(d.key);}},h("div",{className:"nm"},d.label),h("div",{className:"dt"},d.detail));})));}))),
+      ent.length>0&&h("div",{className:"card"},h("div",{className:"cb",style:{padding:"12px 16px"}},
+        ent.map(function(e,i){var d=fD(e.dk),wk=eth(e.vol,e.abv)*(Number(e.srv)||0)*(Number(e.days)||0);
+          return h("div",{key:e.id,className:"entry"},
+            h("div",{className:"ehd"},h("div",{className:"lt"},h("span",{className:"en"},i+1),h("span",{className:"enm"},d.label)),h("div",{style:{display:"flex",alignItems:"center",gap:8}},h("span",{className:"ew"},fx(wk,0)+" g/wk"),h("button",{className:"xb",onClick:function(){rm(e.id);}},"\u2715"))),
+            h("div",{className:"ctrls"},
+              NI({label:"Vol (mL)",value:e.vol,onChange:function(v){upd(e.id,{vol:v});},unit:"mL"}),
+              NI({label:"ABV (%)",value:e.abv,onChange:function(v){upd(e.id,{abv:v});},step:.1,unit:"%"}),
+              Stp({label:"Servings/day",value:e.srv,onChange:function(v){upd(e.id,{srv:v});},step:.5,min:0,max:30}),
+              Stp({label:"Days/week",value:e.days,onChange:function(v){upd(e.id,{days:v});},min:0,max:7}),
+              h("div",{className:"fld"},h("span",{className:"fl"},"Uncertain?"),h("button",{className:"ub "+(e.unc?"on":"off"),onClick:function(){upd(e.id,{unc:!e.unc});}},e.unc?"\u26A0 Yes":"No"))),
+            e.unc&&h("div",{className:"ctrls",style:{marginTop:8}},NI({label:"Min ABV",value:e.abvMin,onChange:function(v){upd(e.id,{abvMin:v});},step:.1,unit:"%"}),NI({label:"Max ABV",value:e.abvMax,onChange:function(v){upd(e.id,{abvMax:v});},step:.1,unit:"%"})));
+        }),
+        h("div",{className:"rt"},h("span",null,"Weekly total"),h("span",null,h("span",{className:"v"},fx(calc.tw,0))," g/wk  \xa0|\xa0 ",h("span",{className:"v"},fx(calc.u,1))," units")))),
+      h("button",{className:"pbtn",disabled:ent.length===0,onClick:function(){go(5);}},"Continue"),
+      h("button",{className:"gbtn",onClick:function(){go(2);}},"Back")),
+
+    /* ═══ STEP 5: BINGE + LIFETIME YEARS ═══ */
+    step===5&&h("div",{className:"card"},h("div",{className:"cb"},
+      h("h2",{style:{fontSize:18,fontWeight:700,marginBottom:4}},"Drinking pattern & history"),
+
+      // Binge
+      h("div",{style:{marginBottom:20}},
+        h("h3",{style:{fontSize:15,fontWeight:600,marginBottom:4}},"Heavy episodic (binge) drinking?"),
+        h("p",{style:{fontSize:13,color:"#64748b",marginBottom:6}},"Consuming a large amount on a single occasion, typically within ~2 hours:"),
+        h("div",{style:{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}},
+          h("div",{style:{flex:1,minWidth:180,padding:"10px 14px",borderRadius:12,border:sex==="male"?"2px solid #3b82f6":"1px solid #e2e8f0",background:sex==="male"?"#eff6ff":"#fff"}},
+            h("div",{style:{fontSize:12,fontWeight:700,color:sex==="male"?"#1d4ed8":"#94a3b8",marginBottom:2}},"\u2642 Males"),
+            h("div",{style:{fontSize:14,fontWeight:600,color:sex==="male"?"#0f172a":"#94a3b8"}},"\u22655 drinks (\u226560 g) per occasion")),
+          h("div",{style:{flex:1,minWidth:180,padding:"10px 14px",borderRadius:12,border:sex==="female"?"2px solid #3b82f6":"1px solid #e2e8f0",background:sex==="female"?"#eff6ff":"#fff"}},
+            h("div",{style:{fontSize:12,fontWeight:700,color:sex==="female"?"#1d4ed8":"#94a3b8",marginBottom:2}},"\u2640 Females"),
+            h("div",{style:{fontSize:14,fontWeight:600,color:sex==="female"?"#0f172a":"#94a3b8"}},"\u22654 drinks (\u226540 g) per occasion"))),
+        h("div",{className:"opt"+(binge===true?" sel":""),onClick:function(){setBg(true);}},
+          h("div",{className:"rd"}),h("div",null,h("div",{className:"tt"},"Yes"),h("div",{className:"ds"},dstat==="current_abstainer"?"Had episodes of binge drinking in the past":"Sometimes consumes "+(sex==="male"?"\u22655 drinks (\u226560 g)":"\u22654 drinks (\u226540 g)")+" in a single sitting (~2 hours)"))),
+        h("div",{className:"opt"+(binge===false?" sel":""),onClick:function(){setBg(false);}},
+          h("div",{className:"rd"}),h("div",null,h("div",{className:"tt"},"No"),h("div",{className:"ds"},"No heavy single-occasion drinking")))),
+
+      // Lifetime years
+      h("div",null,
+        h("h3",{style:{fontSize:15,fontWeight:600,marginBottom:4}},"Lifetime drinking duration"),
+        h("p",{style:{fontSize:13,color:"#64748b",marginBottom:8}},"Approximately how many years "+(dstat==="current_abstainer"?"did the patient drink":"has the patient been drinking")+"?"),
+        h("div",{className:"lyinp"},
+          h("input",{type:"number",min:0,max:80,value:lyrs,onChange:function(e){setLy(e.target.value);},placeholder:"0"}),
+          h("span",null,"years"))),
+
+      h("button",{className:"pbtn",disabled:binge===null,onClick:function(){go(10);}},"See Results"),
+      h("button",{className:"gbtn",onClick:function(){go(dstat==="active"?3:2);}},"Back"))),
+
+    /* ═══ STEP 10: RESULT ═══ */
+    step===10&&function(){
+      var isAbstainer=dstat==="lifetime_abstainer";
+      var isCurAbs=dstat==="current_abstainer";
+      var isActive=dstat==="active";
+      var c=isAbstainer?{label:"No alcohol exposure",sub:"Lifetime abstainer \u2014 alcohol not a contributing factor",color:"#059669",bg:"#ecfdf5",bd:"#6ee7b7"}
+            :isCurAbs?{label:"Currently abstinent",sub:"Prior alcohol exposure \u2014 assess for residual liver injury",color:"#3b82f6",bg:"#eff6ff",bd:"#93c5fd"}
+            :clsf(calc.tw,sex);
+      var t=THR[sex];
+      var bm=sex==="male"?630:525;
+      var mp=(t.masld/bm)*100,mtp=(t.metald/bm)*100,np=Math.min((calc.tw/bm)*100,100);
+      var yrs=Number(lyrs)||0;
+
+      var cpN=function(){
+        var ln=["GLASS-India (Graded Levels of Alcohol in Steatotic liver disease Staging)","Sex: "+(sex==="male"?"Male":"Female"),"Drinking status: "+(isAbstainer?"Lifetime abstainer":isCurAbs?"Current abstainer (\u22656 months)":"Active drinker")];
+        if(isActive){ln.push("Weekly ethanol: "+fx(calc.tw)+" g/wk ("+fx(calc.u)+" std units)");ln.push("Average daily: "+fx(calc.ad)+" g/day");}
+        if(!isAbstainer){
+          ln.push("Binge pattern: "+(binge?"Yes":"No")+(binge?" ("+(sex==="male"?"\u22655 drinks/\u226560g":"\u22654 drinks/\u226540g")+"/occasion)":""));
+          if(yrs>0) ln.push("Lifetime drinking: ~"+yrs+" years");
+        }
+        ln.push("");
+        if(isActive){
+          ln.push("SLD Classification: "+c.label);
+          ln.push("  Thresholds ("+sex+"): MASLD <"+t.masld+" | MetALD "+t.masld+"\u2013"+t.metald+" | ALD >"+t.metald+" g/wk");
+          ln.push("");ln.push("Drinks:");
+          ent.forEach(function(e){var d=fD(e.dk),wk=eth(e.vol,e.abv)*e.srv*e.days;ln.push("  "+d.label+" "+e.vol+"mL \xd7 "+e.abv+"% \xd7 "+e.srv+"/day \xd7 "+e.days+"d/wk = "+fx(wk)+" g/wk");});
+        } else if(isCurAbs){
+          ln.push("Currently abstinent. Assess for residual alcohol-related liver injury.");
+        } else { ln.push("Lifetime abstainer. No alcohol component to SLD."); }
+        ln.push("");ln.push("Note: MASLD/MetALD requires \u22651 cardiometabolic risk factor.");
+        ln.push("Ref: Rinella et al. J Hepatol 2023;79:1542-56");
+        ln.push("Tool: GLASS-India v1.0 (Dr Akash Roy, Apollo Multispeciality Hospitals, Kolkata)");
+        navigator.clipboard.writeText(ln.join("\n")).then(function(){setCp(true);setTimeout(function(){setCp(false);},2000);});};
+
+      return h("div",null,
+        // Main result card
+        h("div",{style:{borderRadius:20,padding:24,marginBottom:16,background:c.bg,border:"2px solid "+c.bd}},
+          h("div",{style:{fontSize:13,fontWeight:600,color:c.color,textTransform:"uppercase",letterSpacing:".04em"}},"SLD Classification"),
+          h("div",{style:{fontSize:32,fontWeight:700,color:c.color,marginTop:4}},c.label),
+          h("div",{style:{fontSize:14,color:c.color,opacity:.8,marginTop:4}},c.sub),
+
+          // Status pills
+          h("div",{style:{marginTop:14}},
+            // Drinking status pill
+            h("span",{className:"pill",style:{background:isAbstainer?"#ecfdf5":isCurAbs?"#eff6ff":"#f1f5f9",color:isAbstainer?"#059669":isCurAbs?"#3b82f6":"#475569",border:"1px solid "+(isAbstainer?"#6ee7b7":isCurAbs?"#93c5fd":"#e2e8f0")}},
+              isAbstainer?"Lifetime abstainer":isCurAbs?"Abstinent \u22656 mo":"Active drinker"),
+            // Binge pill
+            !isAbstainer&&h("span",{className:"pill",style:{background:binge?"#fef2f2":"#ecfdf5",color:binge?"#dc2626":"#059669",border:"1px solid "+(binge?"#fca5a5":"#6ee7b7")}},
+              binge?"Binge: Yes":"Binge: No"),
+            // Lifetime years pill
+            !isAbstainer&&yrs>0&&h("span",{className:"pill",style:{background:"#f1f5f9",color:"#475569",border:"1px solid #e2e8f0"}},
+              "~"+yrs+" yr drinking history")),
+
+          // Numbers (active only)
+          isActive&&h("div",{style:{display:"flex",gap:20,flexWrap:"wrap",marginTop:20}},
+            h("div",{style:{textAlign:"center"}},h("div",{className:"mono",style:{fontSize:28,fontWeight:700,color:c.color}},fx(calc.tw,0)),h("div",{style:{fontSize:11,color:c.color,opacity:.7}},"g / week")),
+            h("div",{style:{textAlign:"center"}},h("div",{className:"mono",style:{fontSize:28,fontWeight:700,color:c.color}},fx(calc.ad,1)),h("div",{style:{fontSize:11,color:c.color,opacity:.7}},"g / day (avg)")),
+            h("div",{style:{textAlign:"center"}},h("div",{className:"mono",style:{fontSize:28,fontWeight:700,color:c.color}},fx(calc.u,1)),h("div",{style:{fontSize:11,color:c.color,opacity:.7}},"std units"))),
+
+          // Threshold bar (active only)
+          isActive&&h("div",{style:{marginTop:20,position:"relative"}},
+            h("div",{style:{display:"flex",borderRadius:8,overflow:"hidden",height:14}},h("div",{style:{width:mp+"%",background:"#34d399"}}),h("div",{style:{width:(mtp-mp)+"%",background:"#fbbf24"}}),h("div",{style:{width:(100-mtp)+"%",background:"#f87171"}})),
+            h("div",{style:{position:"absolute",top:-5,left:np+"%",transform:"translateX(-50%)",width:4,height:24,background:c.color,borderRadius:3,boxShadow:"0 0 0 2px #fff",transition:"left .5s"}}),
+            h("div",{style:{display:"flex",marginTop:6,fontSize:10,color:"#64748b"}},
+              h("div",{style:{width:mp+"%",textAlign:"center"}},"MASLD",h("br"),h("b",null,"<"+t.masld)),
+              h("div",{style:{width:(mtp-mp)+"%",textAlign:"center"}},"MetALD",h("br"),h("b",null,t.masld+"\u2013"+t.metald)),
+              h("div",{style:{width:(100-mtp)+"%",textAlign:"center"}},"ALD",h("br"),h("b",null,">"+t.metald))),
+            h("div",{style:{textAlign:"center",fontSize:10,color:"#94a3b8",marginTop:2}},"g / week")),
+
+          // CMRF note
+          h("div",{style:{marginTop:16,padding:"10px 14px",borderRadius:10,background:"#fff",border:"1px solid "+c.bd,fontSize:12,color:"#475569"}},
+            h("strong",null,"Reminder: "),"MASLD/MetALD requires \u22651 cardiometabolic risk factor (BMI \u226525/\u226523 Asian, WC, BP, TG, HDL, glucose/T2DM). ALD by alcohol threshold alone.",
+            isCurAbs&&h("span",null," Even in current abstainers, prior alcohol exposure may contribute to ongoing liver injury.")),
+
+          // Buttons
+          h("div",{style:{display:"flex",flexWrap:"wrap",gap:8,marginTop:16}},
+            h("button",{className:"cpb",style:{borderColor:c.bd,color:c.color},onClick:cpN},copied?"\u2713 Copied":"Copy for notes"),
+            h("button",{className:"rsb",style:{borderColor:c.bd,color:c.color},onClick:reset},"New Assessment"))),
+
+        // Drink breakdown (active only)
+        isActive&&h("div",{className:"card"},h("div",{className:"cb",style:{fontSize:13,color:"#475569"}},
+          h("div",{style:{fontWeight:600,marginBottom:8,fontSize:14}},"Drink breakdown"),
+          ent.map(function(e,i){var d=fD(e.dk),wk=eth(e.vol,e.abv)*e.srv*e.days;
+            return h("div",{key:e.id,style:{display:"flex",justifyContent:"space-between",padding:"4px 0",borderBottom:i<ent.length-1?"1px solid #f1f5f9":"none"}},
+              h("span",null,d.label+" ("+e.vol+"mL \xd7 "+e.abv+"% \xd7 "+e.srv+"/d \xd7 "+e.days+"d/wk)"),
+              h("span",{className:"mono",style:{fontWeight:600}},fx(wk,0)+" g"));}))),
+
+        // Reference
+        h("div",{className:"card"},h("div",{className:"cb"},
+          h("div",{style:{fontWeight:600,fontSize:13,marginBottom:4}},"2023 Delphi Consensus Reference"),
+          h("div",{style:{fontSize:12,color:"#475569",marginBottom:4}},"g ethanol = vol(mL) \xd7 ABV(%) \xd7 0.789 \xf7 100 \xa0|\xa0 1 std unit = 10 g"),
+          h("table",{className:"rtbl"},
+            h("thead",null,h("tr",null,h("th",null,""),h("th",null,"\u2640 g/d"),h("th",null,"g/wk"),h("th",null,"\u2642 g/d"),h("th",null,"g/wk"))),
+            h("tbody",null,
+              h("tr",{className:"r0"},h("td",{style:{fontWeight:600,color:"#059669"}},"MASLD"),h("td",null,"<20"),h("td",null,"<140"),h("td",null,"<30"),h("td",null,"<210")),
+              h("tr",{className:"r1"},h("td",{style:{fontWeight:600,color:"#d97706"}},"MetALD"),h("td",null,"20\u201350"),h("td",null,"140\u2013350"),h("td",null,"30\u201360"),h("td",null,"210\u2013420")),
+              h("tr",{className:"r2"},h("td",{style:{fontWeight:600,color:"#dc2626"}},"ALD"),h("td",null,">50"),h("td",null,">350"),h("td",null,">60"),h("td",null,">420")))),
+          h("div",{style:{fontSize:11,color:"#94a3b8",marginTop:6}},"Rinella ME et al. J Hepatol 2023;79:1542-56"))),
+
+        h("div",{className:"disc"},h("span",null,"\u26A0"),h("span",null,"Estimation aid. Not a validated instrument or diagnostic tool. For screening use AUDIT-C. No data leaves this device.")));
+    }(),
+
+    // Footer (always visible)
+    h("div",{style:{marginTop:24,paddingTop:16,borderTop:"1px solid #e2e8f0",textAlign:"center",fontSize:11,color:"#94a3b8",lineHeight:1.6}},
+      h("div",null,"Developed by Dr Akash Roy"),
+      h("div",null,"Institute of Gastrosciences and Liver Transplantation"),
+      h("div",null,"Apollo Multispeciality Hospitals, Kolkata"),
+      h("div",{style:{marginTop:6}},"GLASS-India v1.0 \xb7 2026 \xb7 No data collected"))
+  );
+}
+ReactDOM.render(h(App),document.getElementById("root"));
+</script>
+</body>
+</html>
